@@ -1,0 +1,10 @@
+# Credenciais — nunca suba este arquivo
+terraform.tfvars
+
+# Estado do Terraform
+*.tfstate
+*.tfstate.backup
+
+# Diretório de plugins e cache
+.terraform/
+.terraform.lock.hcl

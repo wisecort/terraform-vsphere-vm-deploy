@@ -1,0 +1,70 @@
+# ============================================================
+# CREDENCIAIS vCenter
+# Copie este arquivo para terraform.tfvars e preencha os valores.
+# NÃO suba o terraform.tfvars para o repositório (veja .gitignore).
+# ============================================================
+
+vsphere_server   = "vcenter.empresa.local"
+vsphere_user     = "administrator@vsphere.local"
+vsphere_password = "SENHA_AQUI"
+
+# ============================================================
+# INFRAESTRUTURA
+# ============================================================
+
+datacenter        = "NOME_DO_DATACENTER"
+cluster           = "NOME_DO_CLUSTER"
+template_name     = "NOME_DO_TEMPLATE_LINUX"
+datastore_default = "NOME_DO_DATASTORE"
+default_dns_suffix = "empresa.local"
+
+# ============================================================
+# VMs A CRIAR
+# Adicione ou remova blocos conforme necessário.
+#
+# resource_pool → "<NomeCluster>/Resources" para o pool raiz
+#                 "<NomeCluster>/Resources/<SubPool>" para sub-pools
+# netmask       → prefixo CIDR numérico (ex: 24 para /24)
+# datastore     → opcional; sobrescreve o datastore_default por VM
+# folder        → opcional; pasta no inventário vCenter
+# ============================================================
+
+vms = {
+
+  "vm1" = {
+    vm_name       = "NOME-DA-VM-01"
+    annotation    = "Criado via Terraform"
+    folder        = ""
+
+    cpus          = 4
+    memory_mb     = 8192
+    disk_size_gb  = 100
+
+    portgroup     = "NOME_DO_PORTGROUP"
+    ip_address    = "192.168.1.101"
+    netmask       = 24
+    gateway       = "192.168.1.1"
+    dns_servers   = ["8.8.8.8", "8.8.4.4"]
+
+    resource_pool = "NOME_DO_CLUSTER/Resources"
+  }
+
+  # "vm2" = {
+  #   vm_name       = "NOME-DA-VM-02"
+  #   annotation    = "Criado via Terraform"
+  #   folder        = ""
+  #
+  #   cpus          = 4
+  #   memory_mb     = 8192
+  #   disk_size_gb  = 100
+  #
+  #   portgroup     = "NOME_DO_PORTGROUP"
+  #   ip_address    = "192.168.1.102"
+  #   netmask       = 24
+  #   gateway       = "192.168.1.1"
+  #   dns_servers   = ["8.8.8.8", "8.8.4.4"]
+  #
+  #   resource_pool = "NOME_DO_CLUSTER/Resources"
+  # }
+
+}

@@ -1,0 +1,95 @@
+# ============================================================
+# CREDENCIAIS vCenter
+# Copie este arquivo para terraform.tfvars e preencha os valores.
+# NAO suba o terraform.tfvars para o repositorio (veja .gitignore).
+# ============================================================
+
+vsphere_server   = "vcenter.empresa.local"
+vsphere_user     = "administrator@vsphere.local"
+vsphere_password = "SENHA_AQUI"
+
+# ============================================================
+# INFRAESTRUTURA
+# ============================================================
+
+datacenter        = "NOME_DO_DATACENTER"
+cluster           = "NOME_DO_CLUSTER"
+template_name     = "NOME_DO_TEMPLATE_WINDOWS"
+datastore_default = "NOME_DO_DATASTORE"
+
+# ============================================================
+# VMs A CRIAR
+# Adicione ou remova blocos conforme necessario.
+#
+# ATENCAO: vm_name e usado como computer_name do Windows.
+#          Maximo 15 caracteres (limite NetBIOS).
+#
+# resource_pool     -> "<NomeCluster>/Resources" para o pool raiz
+#                      "<NomeCluster>/Resources/<SubPool>" para sub-pools
+# netmask           -> prefixo CIDR numerico (ex: 24 para /24)
+# admin_password    -> senha do Administrador local
+# full_name         -> nome do proprietario (Registration Info do Sysprep)
+# organization_name -> nome da organizacao (Registration Info do Sysprep)
+# product_key       -> chave de licenca Windows (deixe "" para usar a do template)
+# workgroup         -> workgroup Windows (padrao: "WORKGROUP")
+# time_zone         -> codigo numerico do fuso horario Windows
+#                      65  = SA Western Standard Time (Salvador/Manaus GMT-3)
+#                      235 = E. South America Standard Time (Brasilia GMT-3)
+#                      85  = GMT Standard Time
+#                      255 = UTC
+# ============================================================
+
+vms = {
+
+  "vm1" = {
+    vm_name           = "WIN-VM-01"           # Max. 15 caracteres
+    annotation        = "Windows Server 2022"
+    folder            = ""
+
+    cpus              = 4
+    memory_mb         = 8192
+    disk_size_gb      = 100
+
+    portgroup         = "NOME_DO_PORTGROUP"
+    ip_address        = "192.168.1.101"
+    netmask           = 24
+    gateway           = "192.168.1.1"
+    dns_servers       = ["8.8.8.8", "8.8.4.4"]
+
+    resource_pool     = "NOME_DO_CLUSTER/Resources"
+
+    # Sysprep / Customizacao Windows
+    admin_password    = "SENHA_ADMIN_LOCAL"
+    full_name         = "Administrador"
+    organization_name = "Empresa"
+    product_key       = ""                    # Deixe "" para usar a licenca do template
+    workgroup         = "WORKGROUP"
+    time_zone         = 65                    # Salvador/Manaus (GMT-3)
+  }
+
+  # "vm2" = {
+  #   vm_name           = "WIN-VM-02"
+  #   annotation        = "Windows Server 2022"
+  #   folder            = ""
+  #
+  #   cpus              = 4
+  #   memory_mb         = 8192
+  #   disk_size_gb      = 100
+  #
+  #   portgroup         = "NOME_DO_PORTGROUP"
+  #   ip_address        = "192.168.1.102"
+  #   netmask           = 24
+  #   gateway           = "192.168.1.1"
+  #   dns_servers       = ["8.8.8.8", "8.8.4.4"]
+  #
+  #   resource_pool     = "NOME_DO_CLUSTER/Resources"
+  #
+  #   admin_password    = "SENHA_ADMIN_LOCAL"
+  #   full_name         = "Administrador"
+  #   organization_name = "Empresa"
+  #   product_key       = ""
+  #   workgroup         = "WORKGROUP"
+  #   time_zone         = 65
+  # }
+
+}
