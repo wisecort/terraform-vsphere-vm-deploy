@@ -1,0 +1,52 @@
+# Copie para terraform.tfvars (não versionado) e preencha com placeholders
+# do seu ambiente. Não coloque senha aqui.
+#
+#   export VSPHERE_SERVER="vcenter.empresa.local"
+#   export VSPHERE_USER="administrator@vsphere.local"
+#   export VSPHERE_PASSWORD="SENHA_AQUI"
+#
+# Certificado autoassinado, só em laboratório:
+# allow_unverified_ssl = true
+
+allow_unverified_ssl = false
+
+datacenter         = "NOME_DO_DATACENTER"
+cluster            = "NOME_DO_CLUSTER"
+template_name      = "NOME_DO_TEMPLATE_LINUX"
+datastore_default  = "NOME_DO_DATASTORE"
+default_dns_suffix = "empresa.local"
+
+# Fuso opcional. Null (omisso) deixa UTC, padrão do provider.
+# linux_time_zone = "America/Sao_Paulo"
+
+# resource_pool vazio usa o pool raiz do cluster (<cluster>/Resources).
+# netmask é prefixo CIDR (24 = /24).
+# datastore e folder vazios usam o padrão / a raiz do inventário.
+
+vms = {
+  "vm1" = {
+    vm_name    = "NOME-DA-VM-01"
+    annotation = "Criado via Terraform"
+    folder     = ""
+
+    cpus         = 4
+    memory_mb    = 8192
+    disk_size_gb = 100
+
+    portgroup   = "NOME_DO_PORTGROUP"
+    ip_address  = "192.168.1.101"
+    netmask     = 24
+    gateway     = "192.168.1.1"
+    dns_servers = ["8.8.8.8", "8.8.4.4"]
+
+    resource_pool = "NOME_DO_CLUSTER/Resources"
+
+    # Disco e NIC extras são opcionais. A unidade SCSI 7 é reservada.
+    # extra_disks = [
+    #   { size_gb = 50, label = "dados" }
+    # ]
+    # extra_nics = [
+    #   { portgroup = "NOME_DO_PORTGROUP_2", ip_address = "192.168.2.101", netmask = 24 }
+    # ]
+  }
+}

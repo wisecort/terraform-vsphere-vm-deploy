@@ -1,0 +1,56 @@
+# Copie para terraform.tfvars (não versionado). Senhas NÃO entram neste arquivo.
+#
+#   export VSPHERE_SERVER="vcenter.empresa.local"
+#   export VSPHERE_USER="administrator@vsphere.local"
+#   export VSPHERE_PASSWORD="SENHA_AQUI"
+#
+#   export TF_VAR_windows_admin_passwords='{"vm1":"SENHA_ADMIN_LOCAL"}'
+#   # opcional, formato XXXXX-XXXXX-XXXXX-XXXXX-XXXXX:
+#   # export TF_VAR_windows_product_keys='{"vm1":"AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"}'
+#
+# Ingresso no AD (em vez de workgroup):
+#   domain_name         = "empresa.local"
+#   domain_admin_user   = "ingressador@empresa.local"
+#   domain_ou           = "OU=Servidores,DC=empresa,DC=local"
+#   export TF_VAR_domain_admin_password="SENHA_DOMINIO"
+#
+# allow_unverified_ssl = true   # só laboratório, certificado autoassinado
+
+allow_unverified_ssl = false
+
+datacenter         = "NOME_DO_DATACENTER"
+cluster            = "NOME_DO_CLUSTER"
+template_name      = "NOME_DO_TEMPLATE_WINDOWS"
+datastore_default  = "NOME_DO_DATASTORE"
+default_dns_suffix = "empresa.local"
+dns_suffix_list    = ["empresa.local"]
+
+# 65 = Salvador/Manaus (GMT-3), 235 = Brasília, 85 = GMT, 255 = UTC
+windows_time_zone = 65
+
+# vm_name vira o computer name: no máximo 15 caracteres (NetBIOS).
+
+vms = {
+  "vm1" = {
+    vm_name    = "WIN-VM-01"
+    annotation = "Windows Server 2022"
+    folder     = ""
+
+    cpus         = 4
+    memory_mb    = 8192
+    disk_size_gb = 100
+
+    portgroup   = "NOME_DO_PORTGROUP"
+    ip_address  = "192.168.1.101"
+    netmask     = 24
+    gateway     = "192.168.1.1"
+    dns_servers = ["8.8.8.8", "8.8.4.4"]
+
+    resource_pool = "NOME_DO_CLUSTER/Resources"
+
+    full_name         = "Administrador"
+    organization_name = "Empresa"
+    workgroup         = "WORKGROUP"
+    windows_time_zone = 65
+  }
+}

@@ -1,0 +1,18 @@
+# Backend PostgreSQL. A trava é nativa (advisory lock).
+#
+# O exemplo declara backend "s3" em versions.tf. Para usar Postgres, troque
+# esse bloco por:
+#
+#   backend "pg" {}
+#
+# e inicialize com:
+#   terraform init -backend-config=backend-pg.hcl
+#
+# Não grave a senha neste arquivo. O backend lê PG_CONN_STR quando conn_str
+# fica de fora:
+#   export PG_CONN_STR="postgres://USUARIO:SENHA@postgres.exemplo.local:5432/NOME_DO_BANCO?sslmode=require"
+#
+# Cada deploy pode isolar o estado com PG_SCHEMA_NAME ou com schema_name abaixo.
+# Não reutilize o mesmo schema para dois deploys.
+
+schema_name = "terraform_remote_state"

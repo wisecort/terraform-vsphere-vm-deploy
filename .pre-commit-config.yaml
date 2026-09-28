@@ -1,0 +1,41 @@
+# Mesmos checks do workflow .github/workflows/terraform.yml, mais terraform-docs.
+# Requisitos locais: terraform, tflint, trivy, terraform-docs, pre-commit.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.109.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+        args:
+          - --tf-init-args=-backend=false
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+      - id: terraform_trivy
+        args:
+          - --args=--severity=HIGH,CRITICAL
+          - --args=--exit-code=1
+          - --args=--skip-dirs=.terraform
+      - id: terraform_docs
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --args=--config=__GIT_WORKING_DIR__/.terraform-docs.yml
+
+  - repo: local
+    hooks:
+      - id: terraform-docs-readme-raiz
+        name: terraform-docs no README da raiz
+        entry: bash scripts/terraform-docs.sh
+        language: system
+        files: ^modules/vsphere-vm/.*\.tf$
+        pass_filenames: false

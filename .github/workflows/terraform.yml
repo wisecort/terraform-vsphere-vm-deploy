@@ -1,0 +1,128 @@
+name: Terraform
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  fmt:
+    name: terraform fmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "1.16.4"
+          terraform_wrapper: false
+
+      - name: terraform fmt -check -recursive
+        run: terraform fmt -check -recursive
+
+  validate:
+    name: validate (${{ matrix.diretorio }})
+    runs-on: ubuntu-latest
+    needs: fmt
+    strategy:
+      fail-fast: false
+      matrix:
+        diretorio:
+          - modules/vsphere-vm
+          - examples/linux
+          - examples/windows
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "1.16.4"
+          terraform_wrapper: false
+
+      - name: terraform init -backend=false
+        working-directory: ${{ matrix.diretorio }}
+        run: terraform init -backend=false -input=false
+
+      - name: terraform validate
+        working-directory: ${{ matrix.diretorio }}
+        run: terraform validate
+
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Instalar TFLint
+        uses: terraform-linters/setup-tflint@1cf010d3c7aef302051ccdb68c14c5dc2efa34ef # v6.3.1
+        with:
+          tflint_version: v0.64.0
+          tflint_wrapper: false
+
+      - name: tflint --init
+        run: tflint --init
+
+      - name: tflint
+        run: |
+          set -euo pipefail
+          for diretorio in modules/vsphere-vm examples/linux examples/windows; do
+            tflint --chdir="$diretorio" --config="$GITHUB_WORKSPACE/.tflint.hcl"
+          done
+
+  trivy:
+    name: trivy config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Trivy (módulo)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: modules/vsphere-vm
+          version: v0.74.0
+          scanners: misconfig
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          skip-dirs: .terraform
+          cache: "false"
+
+      - name: Trivy (examples/linux)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: examples/linux
+          version: v0.74.0
+          scanners: misconfig
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          skip-dirs: .terraform
+          cache: "false"
+
+      - name: Trivy (examples/windows)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: examples/windows
+          version: v0.74.0
+          scanners: misconfig
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          skip-dirs: .terraform
+          cache: "false"
