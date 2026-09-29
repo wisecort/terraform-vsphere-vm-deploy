@@ -1,5 +1,43 @@
-terraform.tfvars
+# Segredos e variáveis locais. Os exemplos *.tfvars.example continuam versionados.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Estado local
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
+.terraform.tfstate.lock.info
+crash.log
+crash.*.log
+
+# Overrides de máquina
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Cache de providers e módulos.
+# .terraform.lock.hcl é versionado de propósito (exemplos e módulo).
 .terraform/
-.terraform.lock.hcl
+
+# Backend preenchido. Os *.example ficam no Git.
+backend.hcl
+backend-pg.hcl
+
+# CLI com credencial
+.terraformrc
+terraform.rc
+
+# Ferramentas
+.tflint.d/
+.tflint-cache/
+.trivy/
+.trivy-cache/
+.pre-commit-cache/
+
+# Sistema
+.DS_Store
+*.swp
+*~

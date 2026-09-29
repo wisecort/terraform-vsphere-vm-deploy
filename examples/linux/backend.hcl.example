@@ -1,0 +1,34 @@
+# Backend S3 parcial, compatível com MinIO e com AWS S3.
+# Copie para backend.hcl (esse nome está no .gitignore) e troque os placeholders.
+#
+#   terraform init -backend-config=backend.hcl
+#
+# Credenciais do bucket ficam no ambiente, não aqui:
+#   export AWS_ACCESS_KEY_ID="CHAVE"
+#   export AWS_SECRET_ACCESS_KEY="SEGREDO"
+#
+# Cada deploy usa um key próprio. Não compartilhe o mesmo key entre
+# Linux e Windows, nem entre ambientes.
+
+bucket = "NOME_DO_BUCKET"
+key    = "AMBIENTE/linux/terraform.tfstate"
+region = "us-east-1"
+
+# Trava sem DynamoDB. Exige Terraform >= 1.10 e, no MinIO, conditional writes.
+# dynamodb_table está depreciado no Terraform 1.16.
+use_lockfile = true
+
+endpoints = {
+  s3 = "https://minio.exemplo.local"
+}
+
+use_path_style              = true
+skip_credentials_validation = true
+skip_metadata_api_check     = true
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_s3_checksum            = true
+
+# insecure = true # somente MinIO de laboratório com TLS inválido
+
+# AWS S3 de produção: apague endpoints e os skip_*, e avalie encrypt = true.
